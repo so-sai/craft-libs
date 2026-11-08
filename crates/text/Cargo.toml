@@ -28,7 +28,7 @@ name = "hyphgen"
 required-features = ["generator"]
 
 [features]
-default = ["hyphen", "bidi", "segment", "linebreak"]
+default = ["hyphen", "bidi", "segment", "linebreak", "wrap"]
 # Hyphenation points; English (bundled dictionary and patterns) needs no further feature.
 hyphen = ["dep:hypher", "dep:miniz_oxide", "dep:unicode-general-category"]
 # Bidirectional text: embedding levels, line reordering and mirroring (UAX #9).
@@ -41,6 +41,8 @@ generator = ["hyphen"]
 # Line-break opportunities (UAX #14 with kinsoku) and grapheme-cluster emergency breaks; Thai, Lao,
 # Khmer and Burmese words need their language feature.
 segment = ["dep:unicode-linebreak", "dep:unicode-segmentation"]
+# Line-break opportunities compliant with UAX #14 and hardened with UAX #29 extended grapheme clusters.
+wrap = ["dep:unicode-linebreak", "dep:unicode-segmentation"]
 # With `thai`, `lao`, `khmer` or `burmese`: find their words with ICU4X's LSTM models instead of its
 # dictionaries. Much smaller (for web builds), slower to run, and its words differ slightly.
 lstm = ["segment", "icu_segmenter?/lstm"]

@@ -11,6 +11,8 @@
 //! - [`bidi`] (default): bidirectional text (UAX #9): embedding levels, line reordering and
 //!   mirroring.
 //! - [`linebreak`] (default): line breaking on a font-independent box/glue/penalty model.
+//! - [`wrap`] (default): line-break opportunities (UAX #14) strictly aligned to extended
+//!   grapheme clusters (UAX #29) and preserving non-breaking spaces.
 //!
 //! Language features (`spanish`, `german`, …, `all-languages`) add data for that language and
 //! turn on the modules that use it.
@@ -23,3 +25,8 @@ pub mod hyphen;
 pub mod linebreak;
 #[cfg(feature = "segment")]
 pub mod segment;
+#[cfg(feature = "wrap")]
+pub mod wrap;
+
+#[cfg(feature = "wrap")]
+pub use wrap::{BreakOpportunity, LineBreakIterator, line_break_opportunities};

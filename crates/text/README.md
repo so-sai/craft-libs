@@ -9,6 +9,7 @@ plain text and a language and return what layout needs before it shapes and plac
 | `segment` | `segment` (default) | Line-break opportunities with kinsoku; Thai, Lao, Khmer and Burmese words; grapheme-cluster emergency breaks |
 | `bidi` | `bidi` (default) | Bidirectional text: embedding levels, line reordering, mirroring |
 | `linebreak` | `linebreak` (default) | Line breaking on a box/glue/penalty model |
+| `wrap` | `wrap` (default) | Line-break opportunities (UAX #14) aligned to extended grapheme clusters (UAX #29) and preserving non-breaking spaces |
 
 Language features (`spanish`, `german`, …, `all-languages`) add the data for one language to every
 module that uses it, and turn those modules on. Build with `default-features = false` to leave
@@ -180,6 +181,25 @@ The segmenter has two models, chosen by the `lstm` feature:
 Measured on a minimal `line_breaks` example, against the same example with `segment` alone. The
 LSTM models are slower to run and split a few words differently, mostly compounds broken between
 syllables (Lao ລາດ|ຊະການ, Burmese မြန်|မာ), which are still valid line breaks.
+## Line Breaking Opportunities (`wrap`)
+
+`craft_text::wrap` provides a zero-allocation iterator over line break opportunities (UAX #14)
+hardened with UAX #29 extended grapheme cluster invariants and non-breaking space glue semantics:
+
+```rust
+use craft_text::wrap::{line_break_opportunities, BreakOpportunity};
+
+for (offset, opp) in line_break_opportunities("hello world\n") {
+    // offset is byte index where a break may occur; opp is Allowed or Mandatory.
+}
+```
+
+- **Intra-cluster invariant**: Breaks never split an extended grapheme cluster (UAX #29), protecting
+  decomposed combining diacritics (e.g. Vietnamese NFD vowels) and emoji ZWJ sequences.
+- **NBSP glue semantics**: Breaks are inhibited before and after `U+00A0` (NBSP) and `U+202F` (NNBSP),
+  keeping units and labels (`100 kg`, `Tầng 1`) together across line wraps.
+- **Zero-allocation**: Iterates directly over `&str` with $O(1)$ stack space.
+
 ## Bidi
 
 `craft_text::bidi` runs the Unicode Bidirectional Algorithm (UAX #9, through
